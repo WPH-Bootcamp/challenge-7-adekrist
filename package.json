@@ -1,18 +1,15 @@
 {
-  "name": "todo-app-typescript",
+  "name": "todo-app-typescript-browser",
   "version": "1.0.0",
-  "description": "Command-line To-Do List application using TypeScript",
-  "main": "dist/index.js",
+  "description": "Assignment 7 - Transform To-Do App using TypeScript versi browser",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "npm run build && npm start"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": ["typescript", "todo", "cli"],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
   }
 }

@@ -1,8 +1,39 @@
-// TODO: Definisikan tipe data untuk To-Do item di sini
-// Hint: To-Do sebaiknya memiliki id, text, dan status completed
+export type StatusFilter = 'semua' | 'aktif' | 'selesai';
 
-// TODO: Buat interface untuk To-Do item
+export interface Tugas {
+  id: string;
+  judul: string;
+  selesai: boolean;
+  dibuatPada: string;
+  diperbaruiPada: string;
+}
 
-// TODO: Buat tipe untuk status To-Do (active/done)
+export interface DataPenyimpanan {
+  versi: number;
+  daftarTugas: Tugas[];
+}
 
-// TODO: Buat tipe untuk fungsi-fungsi yang akan digunakan
+export type HasilOperasi<T> =
+  | {
+      berhasil: true;
+      data: T;
+    }
+  | {
+      berhasil: false;
+      pesan: string;
+    };
+
+export interface RingkasanTugas {
+  total: number;
+  aktif: number;
+  selesai: number;
+}
+
+export interface ElemenAplikasi {
+  formulirTugas: HTMLFormElement;
+  inputJudul: HTMLInputElement;
+  daftarTugas: HTMLUListElement;
+  pesanError: HTMLParagraphElement;
+  ringkasan: HTMLParagraphElement;
+  tombolFilter: HTMLButtonElement[];
+}

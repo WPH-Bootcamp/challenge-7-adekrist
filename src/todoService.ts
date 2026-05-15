@@ -1,24 +1,127 @@
-// TODO: Import tipe-tipe yang sudah didefinisikan di types.ts
+import type {
+  HasilOperasi,
+  RingkasanTugas,
+  StatusFilter,
+  Tugas,
+} from './types';
+import { hasilBerhasil, hasilGagal } from './errorUtils';
+import { bacaDaftarTugas, simpanDaftarTugas } from './storage';
+import { bersihkanJudul, validasiJudul } from './validators';
 
-// TODO: Import fungsi storage untuk baca/tulis file
+function buatIdUnik(): string {
+  return crypto.randomUUID();
+}
 
-// TODO: Buat fungsi untuk menambahkan To-Do baru
-// - Generate id yang unik (bisa pakai timestamp atau counter)
-// - Pastikan text tidak kosong
-// - Set default status sebagai active
+function buatWaktuSekarang(): string {
+  return new Date().toISOString();
+}
 
-// TODO: Buat fungsi untuk menandai To-Do sebagai selesai
-// - Cari To-Do berdasarkan id
-// - Ubah statusnya menjadi completed
-// - Handle kasus jika id tidak ditemukan
+export function ambilSemuaTugas(): HasilOperasi<Tugas[]> {
+  return bacaDaftarTugas();
+}
 
-// TODO: Buat fungsi untuk menghapus To-Do
-// - Filter To-Do berdasarkan id
-// - Handle kasus jika id tidak ditemukan
+export function tambahTugas(judul: string): HasilOperasi<Tugas[]> {
+  const pesanValidasi = validasiJudul(judul);
 
-// TODO: Buat fungsi untuk menampilkan semua To-Do
-// - Tampilkan dengan format yang rapi
-// - Tambahkan status [ACTIVE] atau [DONE] di depan setiap To-Do
-// - Berikan nomor urut untuk memudahkan user memilih
+  if (pesanValidasi !== null) {
+    return hasilGagal(pesanValidasi);
+  }
 
-// TODO: Buat fungsi untuk mencari To-Do berdasarkan keyword
+  const hasilBaca = bacaDaftarTugas();
+
+  if (!hasilBaca.berhasil) {
+    return hasilBaca;
+  }
+
+  const waktuSekarang = buatWaktuSekarang();
+
+  const tugasBaru: Tugas = {
+    id: buatIdUnik(),
+    judul: bersihkanJudul(judul),
+    selesai: false,
+    dibuatPada: waktuSekarang,
+    diperbaruiPada: waktuSekarang,
+  };
+
+  const daftarTugasTerbaru = [...hasilBaca.data, tugasBaru];
+
+  return simpanDaftarTugas(daftarTugasTerbaru);
+}
+
+export function ubahStatusTugas(idTugas: string): HasilOperasi<Tugas[]> {
+  const hasilBaca = bacaDaftarTugas();
+
+  if (!hasilBaca.berhasil) {
+    return hasilBaca;
+  }
+
+  const daftarTugas = hasilBaca.data;
+  const tugasDitemukan = daftarTugas.some((tugas) => tugas.id === idTugas);
+
+  if (!tugasDitemukan) {
+    return hasilGagal('Tugas tidak ditemukan.');
+  }
+
+  const waktuSekarang = buatWaktuSekarang();
+
+  const daftarTugasTerbaru = daftarTugas.map((tugas) => {
+    if (tugas.id !== idTugas) {
+      return tugas;
+    }
+
+    return {
+      ...tugas,
+      selesai: !tugas.selesai,
+      diperbaruiPada: waktuSekarang,
+    };
+  });
+
+  return simpanDaftarTugas(daftarTugasTerbaru);
+}
+
+export function hapusTugas(idTugas: string): HasilOperasi<Tugas[]> {
+  const hasilBaca = bacaDaftarTugas();
+
+  if (!hasilBaca.berhasil) {
+    return hasilBaca;
+  }
+
+  const daftarTugas = hasilBaca.data;
+  const tugasDitemukan = daftarTugas.some((tugas) => tugas.id === idTugas);
+
+  if (!tugasDitemukan) {
+    return hasilGagal('Tugas tidak ditemukan.');
+  }
+
+  const daftarTugasTerbaru = daftarTugas.filter(
+    (tugas) => tugas.id !== idTugas
+  );
+
+  return simpanDaftarTugas(daftarTugasTerbaru);
+}
+
+export function filterDaftarTugas(
+  daftarTugas: Tugas[],
+  statusFilter: StatusFilter
+): Tugas[] {
+  if (statusFilter === 'aktif') {
+    return daftarTugas.filter((tugas) => !tugas.selesai);
+  }
+
+  if (statusFilter === 'selesai') {
+    return daftarTugas.filter((tugas) => tugas.selesai);
+  }
+
+  return daftarTugas;
+}
+
+export function hitungRingkasan(daftarTugas: Tugas[]): RingkasanTugas {
+  const selesai = daftarTugas.filter((tugas) => tugas.selesai).length;
+  const total = daftarTugas.length;
+
+  return {
+    total,
+    aktif: total - selesai,
+    selesai,
+  };
+}
