@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do App TypeScript</title>
+  </head>
+  <body>
+    <main class="wadah">
+      <section class="kartu">
+        <h1>To-Do App</h1>
+        <p class="deskripsi">
+          Aplikasi To-Do browser menggunakan TypeScript, localStorage, type
+          guards, dan struktur file modular.
+        </p>
+
+        <form id="formulir-tugas" class="formulir">
+          <label for="input-judul">Judul tugas</label>
+          <div class="baris-input">
+            <input
+              id="input-judul"
+              type="text"
+              placeholder="Contoh: Baca Good to Great"
+              autocomplete="off"
+            />
+            <button type="submit">Tambah</button>
+          </div>
+          <p id="pesan-error" class="pesan-error" aria-live="polite"></p>
+        </form>
+
+        <div class="filter">
+          <button type="button" data-filter="semua" class="aktif">Semua</button>
+          <button type="button" data-filter="aktif">Aktif</button>
+          <button type="button" data-filter="selesai">Selesai</button>
+        </div>
+
+        <ul id="daftar-tugas" class="daftar-tugas"></ul>
+
+        <p id="ringkasan" class="ringkasan"></p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>
